@@ -2,5 +2,5 @@
 /.idea
 
 *.DS_Store
-src/correct.txt
-src/out.txt
+correct.txt
+out.txt

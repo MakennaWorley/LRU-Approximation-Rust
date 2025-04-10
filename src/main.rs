@@ -1,6 +1,7 @@
 mod clock;
 use clock::Clock as LRU;
 use atty::Stream;
+use colored::*;
 
 use std::{
     collections::HashMap,
@@ -10,7 +11,7 @@ use std::{
     process,
 };
 
-const FRAME_COUNT: usize = 128;
+const FRAME_COUNT: usize = 12;
 const PAGE_TABLE_SIZE: usize = 256;
 const TLB_SIZE: usize = 16;
 const CHUNK: usize = 256;
@@ -135,13 +136,15 @@ fn main() {
 
         if output_is_terminal {
             println!(
-                "Virtual address: {} Physical address: {} Value: {}",
-                logical_address, physical_address, value
+                "{} {} {}",
+                "Virtual address:".blue().bold(),
+                logical_address.to_string().yellow(),
+                format!("→ Physical address: {} Value: {}", physical_address, value)
+                    .green()
+                    .bold()
             );
-            println!("Memory: {}", lru.debug_state());
-
-            println!("Memory: {}", lru.debug_state());
-            // std::thread::sleep(std::time::Duration::from_millis(100));
+            println!("{}", lru.debug_state().dimmed());
+            std::thread::sleep(std::time::Duration::from_millis(100));
         } else {
             println!(
                 "Virtual address: {} Physical address: {} Value: {}",
@@ -152,15 +155,43 @@ fn main() {
         translated_count += 1;
     }
 
-    println!("Number of Translated Addresses = {}", translated_count);
-    println!("Page Faults = {}", lru.page_fault_count());
-    println!(
-        "Page Fault Rate = {:.3}",
-        lru.page_fault_count() as f32 / translated_count as f32
-    );
-    println!("TLB Hits = {}", tlb_hits);
-    println!(
-        "TLB Hit Rate = {:.3}",
-        tlb_hits as f32 / translated_count as f32
-    );
+    if output_is_terminal {
+        println!(
+            "{} {}",
+            "Number of Translated Addresses =".cyan(),
+            translated_count.to_string().white().bold()
+        );
+        println!(
+            "{} {}",
+            "Page Faults =".cyan(),
+            lru.page_fault_count().to_string().red().bold()
+        );
+        println!(
+            "{} {:.3}",
+            "Page Fault Rate =".cyan(),
+            lru.page_fault_count() as f32 / translated_count as f32
+        );
+        println!(
+            "{} {}",
+            "TLB Hits =".cyan(),
+            tlb_hits.to_string().bright_magenta().bold()
+        );
+        println!(
+            "{} {:.3}",
+            "TLB Hit Rate =".cyan(),
+            tlb_hits as f32 / translated_count as f32
+        );
+    } else {
+        println!("Number of Translated Addresses = {}", translated_count);
+        println!("Page Faults = {}", lru.page_fault_count());
+        println!(
+            "Page Fault Rate = {:.3}",
+            lru.page_fault_count() as f32 / translated_count as f32
+        );
+        println!("TLB Hits = {}", tlb_hits);
+        println!(
+            "TLB Hit Rate = {:.3}",
+            tlb_hits as f32 / translated_count as f32
+        );
+    }
 }

@@ -1,5 +1,6 @@
 /target
 /.idea
+/c
 
 *.DS_Store
 correct.txt
